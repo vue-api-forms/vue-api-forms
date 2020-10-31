@@ -1,21 +1,22 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import { ControlData } from "@/types";
 
 @Component
 export default class Control extends Vue {
-  @Prop() private type!: string;
-  @Prop() private text!: string;
-  @Prop() private click!: Function;
+  @Prop() private data!: ControlData;
 
-  render(createElement: any) {
+  render(createElement: Function) {
+    const on = {};
+    if (this.data.click) {
+      on.click = new Function(this.data.click.arguments, this.data.click.body);
+    }
     return createElement(
-      this.type,
+      this.data.type,
       {
-        on: {
-          click: this.click
-        }
+        on: on
       },
-      this.text
+      this.data.text
     );
   }
 }
