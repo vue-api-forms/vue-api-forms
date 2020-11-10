@@ -1,5 +1,10 @@
 export interface ControlData {
     type: string;
     text: string;
-    click: Function;
+    click: ControlFunction;
+}
+
+export interface ControlFunction {
+    arguments: string;
+    body: string;
 }

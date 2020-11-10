@@ -1,41 +1,43 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import { ControlData } from "@/types";
+import { SetupContext } from "@vue/composition-api";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const YAML = require("yaml");
 
-@Component
+@Component({
+  setup(props: any, ctx: SetupContext) {
+    const { root } = ctx;
+
+    if (props.searchUrl) {
+      (root as any).$axios.get(props.searchUrl).then(function(response: any) {
+        const searchUrlParsedContent = YAML.parse(response.data);
+        console.log(searchUrlParsedContent);
+      });
+    }
+  }
+})
 export default class Control extends Vue {
-  @Prop() private data!: ControlData;
+  @Prop() private data?: ControlData;
+  @Prop() private searchUrl?: string;
 
   render(createElement: Function) {
-    const on = {};
-    if (this.data.click) {
-      on.click = new Function(this.data.click.arguments, this.data.click.body);
+    const on: any = {};
+    if (this.data) {
+      if (this.data.click) {
+        on.click = new Function(
+          this.data.click.arguments,
+          this.data.click.body
+        );
+      }
+      return createElement(
+        this.data.type,
+        {
+          on: on
+        },
+        this.data.text
+      );
     }
-    return createElement(
-      this.data.type,
-      {
-        on: on
-      },
-      this.data.text
-    );
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
